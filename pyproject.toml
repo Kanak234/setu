@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "setu"
+version = "0.1.0"
+description = "A bridge between a local language model and the Linux kernel: eBPF senses and enforces, the model advises, neither waits for the other"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+keywords = ["ebpf", "kernel", "llm", "ollama", "security"]
+
+# Nothing at runtime. The advisor speaks HTTP to Ollama through the standard
+# library, so the package installs and its tests run on a bare interpreter.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools]
+packages = ["setu"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
