@@ -55,7 +55,7 @@ def run_health(args: argparse.Namespace) -> int:
     if args.json:
         sys.stdout.write(json.dumps(output, indent=2) + "\n")
     else:
-        sys.stdout.write(f"SETU Status: {output["status"].upper()} (v{__version__})\n")
+        sys.stdout.write(f"SETU Status: {output['status'].upper()} (v{__version__})\n")
         for check, res in checks.items():
             sys.stdout.write(f"  [{res.upper()}] {check}\n")
     return 0 if all_passed else 1
