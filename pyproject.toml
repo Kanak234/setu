@@ -9,17 +9,52 @@ description = "A bridge between a local language model and the Linux kernel: eBP
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-keywords = ["ebpf", "kernel", "llm", "ollama", "security"]
+authors = [
+    { name = "Kanak Prabhakar", email = "kanakprabhakar72@gmail.com" }
+]
+keywords = ["ebpf", "kernel", "llm", "ollama", "security", "linux", "tracing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Operating System Kernels :: Linux",
+    "Topic :: Security",
+]
 
-# Nothing at runtime. The advisor speaks HTTP to Ollama through the standard
-# library, so the package installs and its tests run on a bare interpreter.
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4.0",
+]
+
+[project.scripts]
+setu = "setu.cli:main"
 
 [tool.setuptools]
 packages = ["setu"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-v --cov=setu --cov-report=term-missing --cov-report=xml --cov-fail-under=90"
+
+[tool.coverage.run]
+source = ["setu"]
+omit = ["setu/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
