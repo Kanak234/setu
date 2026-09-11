@@ -21,7 +21,7 @@ import urllib.request
 from collections import Counter
 from dataclasses import dataclass
 
-from .events import Event, Kind
+from .events import Event
 from .policy import Action, Verdict
 
 DEFAULT_ENDPOINT = "http://localhost:11434"

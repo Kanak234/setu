@@ -9,9 +9,8 @@ is precisely why the contract needs pinning from this side.
 import re
 from pathlib import Path
 
-from setu.events import WIRE_SIZE
+from setu.events import Kind, WIRE_SIZE
 from setu.policy import KEY_SIZE, VERDICT_SIZE, Action
-from setu.events import Kind
 
 BPF_C = Path(__file__).resolve().parent.parent / "bpf" / "setu.bpf.c"
 
@@ -23,14 +22,14 @@ def defines() -> dict[str, int]:
     resolve instead of failing to parse."""
     return {
         m.group(1): int(m.group(2))
-        for m in re.finditer(r"^#define\s+(\w+)\s+(\d+)\s*$", BPF_C.read_text(), re.M)
+        for m in re.finditer(r"^#define\s+(\w+)\s+(\d+)\s*$", BPF_C.read_text(), re.MULTILINE)
     }
 
 
 def struct_size(name: str) -> int:
     """Size of a packed C struct, read out of the source."""
     src = BPF_C.read_text()
-    m = re.search(rf"struct {name} \{{(.*?)\}}", src, re.S)
+    m = re.search(rf"struct {name} \{{(.*?)\}}", src, re.DOTALL)
     assert m, f"struct {name} not found in {BPF_C.name}"
     consts = defines()
     total = 0
@@ -67,7 +66,7 @@ def test_every_struct_on_the_boundary_is_packed():
     # meaning anything.
     src = BPF_C.read_text()
     for name in ("setu_event", "setu_key", "setu_verdict"):
-        m = re.search(rf"struct {name} \{{.*?\}}\s*(__attribute__\(\(packed\)\))?", src, re.S)
+        m = re.search(rf"struct {name} \{{.*?\}}\s*(__attribute__\(\(packed\)\))?", src, re.DOTALL)
         assert m and m.group(1), f"struct {name} is not packed"
 
 
