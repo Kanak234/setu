@@ -1,6 +1,30 @@
+# Bytecode & Caches
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Packaging & Builds
+build/
+dist/
 *.egg-info/
+*.egg
+*.whl
+*.tar.gz
+
+# Coverage
+.coverage
+coverage.xml
+coverage/
+htmlcov/
+
+# Kernel & eBPF generated
 bpf/*.o
 vmlinux.h
+
+# Environment
+.venv/
+env/
+venv/

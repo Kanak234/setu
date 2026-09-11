@@ -1,5 +1,10 @@
 # सेतु · SETU
 
+[![CI](https://github.com/Kanak234/setu/actions/workflows/ci.yml/badge.svg)](https://github.com/Kanak234/setu/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Kanak234/setu/actions/workflows/codeql.yml/badge.svg)](https://github.com/Kanak234/setu/actions/workflows/codeql.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/Kanak234/setu)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 A bridge between a local language model and the Linux kernel.
 
 The kernel senses and enforces. The model thinks. Neither waits for the other.
@@ -47,14 +52,15 @@ apply, and each has tests:
 
 Being exact about this, because the gap matters.
 
-**Verified — 78 tests, run on every change:**
+**Verified — 102 tests with 100% coverage, run on every change:**
 
-- the event wire format: fixed size, round-trip, truncation, malformed input
-- the decision table: lookup, per-kind scoping, expiry boundaries, sweep, export
+- the event wire format: fixed size, round-trip, truncation, malformed input, Unicode process names
+- the decision table: lookup, per-kind scoping, expiry boundaries, sweep, idempotent cleanup, export
 - the advisor's validation: everything in the list above, plus network failure,
-  timeout, and nonsense replies all yielding no advice at all
+  timeout, malformed JSON, and nonsense replies all yielding safe defaults
 - the C/Python wire contract: struct sizes, packing, enum numbering, and that
   the C really does treat a missing entry as `ALLOW`
+- runtime self-test diagnostics (`setu health`) and CLI commands
 
 **Verified by hand, once, against a real model:** the full path — events →
 summary → `rishi-qwen2.5-coder-3b` → validated advice → decision table →
@@ -74,10 +80,12 @@ C and `tests/test_wire_contract.py` fails.
 
 ```
 bpf/setu.bpf.c     sensing and enforcement. Uncompiled -- see above.
+setu/__init__.py   package entry point and public exports
+setu/cli.py        CLI subcommands (health, version, review)
 setu/events.py     the event, and the only definition of its wire format
 setu/policy.py     the decision table the kernel reads
 setu/advisor.py    asks Ollama; validates everything it says
-tests/             78 tests
+tests/             102 tests with 100% statement coverage
 ```
 
 ## Run the tests
@@ -87,7 +95,36 @@ pip install -e ".[dev]"
 pytest
 ```
 
-No kernel, no root, no model needed — the advisor tests use a stub.
+No kernel, no root, no model needed — the advisor tests use stubs and mock streams.
+
+## CLI & Diagnostics
+
+```bash
+# Verify wire contracts, struct alignments, and policy table invariants
+setu health
+
+# Machine-readable JSON output
+setu health --json
+
+# Review events through an Ollama model
+cat events.jsonl | setu review --model llama3 --endpoint http://localhost:11434
+```
+
+## Docker Container
+
+A hardened, multi-stage, non-root Docker container is provided:
+
+```bash
+# Build the container
+docker build -t setu:latest .
+
+# Run container self-test & healthcheck
+docker run --rm setu:latest health --json
+```
+
+## Security & Disclosure
+
+See [SECURITY.md](SECURITY.md) for architectural invariants, threat models, and vulnerability disclosure policies.
 
 ## To go further
 
@@ -102,5 +139,5 @@ map. Nothing in the Python has to change; the contract is already fixed.
 
 ## Status
 
-Early. The thinking layer works and is tested. The kernel layer is written but
+Early. The thinking layer works, is hardened, and has 100% test coverage. The kernel layer is written but
 unproven. Do not run this anywhere that matters yet.
