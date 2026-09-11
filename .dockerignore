@@ -1,0 +1,12 @@
+.git
+.github
+.pytest_cache
+.coverage
+coverage.xml
+tests/
+__pycache__/
+*.pyc
+*.pyo
+dist/
+build/
+*.egg-info/
