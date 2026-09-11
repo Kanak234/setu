@@ -1,7 +1,9 @@
-import json
 import io
+import json
+import os
 import subprocess
 import sys
+from pathlib import Path
 import pytest
 from unittest.mock import patch
 
@@ -123,12 +125,15 @@ class TestCliCommands:
             assert advice_json["action"] == "ALLOW"
 
     def test_module_main_invocation(self):
+        root_dir = str(Path(__file__).resolve().parent.parent)
+        env = dict(os.environ)
+        env["PYTHONPATH"] = root_dir
         res = subprocess.run(
             [sys.executable, "-m", "setu", "health", "--json"],
-            cwd="/home/kanak/repos_workdir/setu",
-            env={"PYTHONPATH": "/home/kanak/repos_workdir/setu", "PATH": "/usr/bin:/bin"},
+            cwd=root_dir,
+            env=env,
             capture_output=True,
-            text=True
+            text=True,
         )
         assert res.returncode == 0
         data = json.loads(res.stdout)
